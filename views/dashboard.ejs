@@ -20,16 +20,16 @@
           <h3 class="my-4">Dashboard</h3>
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link" href="/events/new">Add Event</a>
+              <a class="nav-link" href="/items/new">Add item</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/events">Manage Events</a>
+              <a class="nav-link" href="/items">Manage items</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/halls/new">Add Hall</a>
+              <a class="nav-link" href="/orders/new">Add orders</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/halls">Manage Halls</a>
+              <a class="nav-link" href="/orders">Manage orders</a>
             </li>
             <!-- Add more links as needed -->
           </ul>
@@ -43,8 +43,9 @@
         <div class="col-md-9">
           <h1 class="my-4">Analytics</h1>
           <!-- Add analytics content here -->
-          <% include components/eventsList.ejs %> <% include
-          components/hallsList.ejs %>
+
+          <% include components/ordersList.ejs %> <% include
+          components/itemsList.ejs %>
         </div>
       </div>
     </div>

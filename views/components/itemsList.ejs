@@ -1,0 +1,101 @@
+<!-- itemsList.ejs -->
+
+<div class="container mt-5">
+  <h1 class="mb-4">Items List</h1>
+  <table class="table" id="itemsTable">
+    <thead>
+      <tr>
+        <th scope="col">Item Name</th>
+        <th scope="col">Image</th>
+        <th scope="col">Price</th>
+        <th scope="col">Cook Time</th>
+        <th scope="col">Category</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="itemsList">
+      <!-- Items will be added here dynamically -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const itemsTable = document.getElementById("itemsList");
+    let categoriesMap = {};
+
+    // Fetch categories first
+    fetch("/categories")
+      .then((response) => response.json())
+      .then((categories) => {
+        categoriesMap = categories.reduce((acc, category) => {
+          acc[category.id] = category.name;
+          return acc;
+        }, {});
+
+        // Fetch items from the server
+        fetch("/items")
+          .then((response) => response.json())
+          .then((items) => {
+            items.forEach((item) => {
+              // Create a new row for each item
+              const row = document.createElement("tr");
+              row.setAttribute("data-item-id", item.id); // Add data attribute for item ID
+              row.innerHTML = `
+                <td>${item.name}</td>
+                <td><img src="${item.img_url}" alt="${
+                item.name
+              }" class="img-thumbnail" style="max-width: 100px;"></td>
+                <td>${item.price.toFixed(2)}</td>
+                <td>${item.cook_time}</td>
+                <td>${
+                  categoriesMap[item.category_id]
+                }</td> <!-- Use categoriesMap to get category name -->
+                <td>
+                  <a type="button" class="btn btn-primary" href="/items/${
+                    item.id
+                  }">Details</a>
+                  <a href="/items/${
+                    item.id
+                  }/edit" class="btn btn-warning me-2">Edit</a>
+                  <button type="button" class="btn btn-danger delete-btn" data-item-id="${
+                    item.id
+                  }">Delete</button>
+                </td>
+              `;
+              itemsTable.appendChild(row);
+            });
+
+            // Add event listener for delete buttons
+            const deleteButtons = document.querySelectorAll(".delete-btn");
+            deleteButtons.forEach((button) => {
+              button.addEventListener("click", function () {
+                const itemId = this.getAttribute("data-item-id");
+
+                // Perform AJAX request to delete the item
+                fetch(`/items/del/${itemId}`, {
+                  method: "post",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                })
+                  .then((response) => {
+                    if (response.ok) {
+                      // Remove the row from the table
+                      const row = document.querySelector(
+                        `tr[data-item-id="${itemId}"]`
+                      );
+                      row.remove();
+                    } else {
+                      console.error("Failed to delete item");
+                    }
+                  })
+                  .catch((error) => console.error("Error:", error));
+              });
+            });
+          })
+          .catch((error) => console.error("Error fetching items:", error));
+      })
+      .catch((error) => console.error("Error fetching categories:", error));
+  });
+</script>

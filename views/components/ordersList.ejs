@@ -1,0 +1,81 @@
+<div class="container mt-5">
+  <h1 class="mb-4">Orders List</h1>
+  <table class="table" id="ordersTable">
+    <thead>
+      <tr>
+        <th scope="col">Order ID</th>
+        <th scope="col">Customer Name</th>
+        <th scope="col">Total Price</th>
+        <th scope="col">Order Date</th>
+
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="ordersList">
+      <!-- Orders will be added here dynamically -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const ordersTable = document.getElementById("ordersList");
+
+    // Fetch orders from the server
+    fetch("/orders")
+      .then((response) => response.json())
+      .then((orders) => {
+        orders.forEach((order) => {
+          // Create a new row for each order
+          const row = document.createElement("tr");
+          row.setAttribute("data-order-id", order.id); // Add data attribute for order ID
+          row.innerHTML = `
+            <td>${order.id}</td>
+            <td>${order.username}</td>
+            <td>${order.total_price.toFixed(2)}</td>
+            <td>${order.order_date}</td>
+           
+            <td>
+              <a type="button" class="btn btn-primary" href="/orders/${
+                order.id
+              }">Details</a>
+            
+              <button type="button" class="btn btn-danger delete-btn" data-order-id="${
+                order.id
+              }">Delete</button>
+            </td>
+          `;
+          ordersTable.appendChild(row);
+        });
+
+        // Add event listener for delete buttons
+        const deleteButtons = document.querySelectorAll(".delete-btn");
+        deleteButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const orderId = this.getAttribute("data-order-id");
+
+            // Perform AJAX request to delete the order
+            fetch(`/orders/del/${orderId}`, {
+              method: "post",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((response) => {
+                if (response.ok) {
+                  // Remove the row from the table
+                  const row = document.querySelector(
+                    `tr[data-order-id="${orderId}"]`
+                  );
+                  row.remove();
+                } else {
+                  console.error("Failed to delete order");
+                }
+              })
+              .catch((error) => console.error("Error:", error));
+          });
+        });
+      })
+      .catch((error) => console.error("Error fetching orders:", error));
+  });
+</script>

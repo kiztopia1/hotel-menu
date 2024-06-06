@@ -41,6 +41,7 @@ const { isAuthenticated } = require("./middleware/auth");
 // Apply isAuthenticated middleware globally
 
 app.use("/", menuRouter);
+app.use("/dashboard", dashboardRouter);
 app.use("/items", itemRtouter);
 app.use("/orders", orderRouter);
 

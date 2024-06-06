@@ -8,10 +8,11 @@ router.get("/", (req, res) => {
 });
 
 router.post("/login", (req, res) => {
-  const { name, password } = req.body;
-  const query = "SELECT * FROM admins WHERE name = ? AND password = ?";
+  const { username, password } = req.body; // Changed from "name" to "username"
+  console.log(req.body);
+  const query = "SELECT * FROM Admin WHERE username = ? AND password = ?"; // Changed column name from "name" to "username"
 
-  db.get(query, [name, password], (err, admin) => {
+  db.get(query, [username, password], (err, admin) => {
     if (err) {
       console.error("Error fetching admin:", err.message);
       return res.status(500).json({ message: "Internal server error" });
