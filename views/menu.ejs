@@ -1,0 +1,162 @@
+<%- include('partials/head') %>
+<div class="container mt-5">
+  <div class="row">
+    <!-- Items List Column -->
+    <div class="col-md-9">
+      <h2>Items</h2>
+      <div id="item-list" class="d-flex flex-wrap">
+        <!-- Items will be dynamically inserted here -->
+      </div>
+    </div>
+
+    <!-- Order Calculator Column -->
+    <div class="col-md-3">
+      <div id="order-calculator" class="position-fixed">
+        <h2>Order Calculator</h2>
+        <ul id="order-list" class="list-group mb-3"></ul>
+        <p><strong>Total Price: </strong>$<span id="total-price">0.00</span></p>
+        <p>
+          <strong>Total Cook Time: </strong
+          ><span id="total-cook-time">0</span> minutes
+        </p>
+        <button id="checkout" class="btn btn-success">Checkout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const itemList = document.getElementById("item-list");
+    const orderList = document.getElementById("order-list");
+    const totalPriceElem = document.getElementById("total-price");
+    const totalCookTimeElem = document.getElementById("total-cook-time");
+    let totalPrice = 0;
+    let totalCookTime = 0;
+
+    // Fetch items from /items
+    fetch("/items")
+      .then((response) => response.json())
+      .then((items) => {
+        items.forEach((item) => {
+          const card = document.createElement("div");
+          card.classList.add("card", "m-2");
+          card.style.width = "30%";
+          card.innerHTML = `
+            <img src="${item.img_url}" class="card-img-top" alt="${item.name}">
+            <div class="card-body">
+              <h5 class="card-title">${item.name}</h5>
+              <p class="card-text">Price: $${item.price}</p>
+              <p class="card-text">Cook Time: ${item.cook_time} </p>
+              <button class="btn btn-primary add-to-order" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" data-cook-time="${item.cook_time}">Add</button>
+            </div>
+          `;
+          itemList.appendChild(card);
+        });
+      })
+      .catch((error) => console.error("Error fetching items:", error));
+
+    itemList.addEventListener("click", (e) => {
+      if (e.target.classList.contains("add-to-order")) {
+        const itemId = e.target.dataset.id;
+        const itemName = e.target.dataset.name;
+        const itemPrice = parseFloat(e.target.dataset.price);
+        const itemCookTime = parseInt(e.target.dataset.cookTime);
+
+        // Add item to order list
+        const listItem = document.createElement("li");
+        listItem.classList.add(
+          "list-group-item",
+          "d-flex",
+          "justify-content-between",
+          "align-items-center"
+        );
+        listItem.dataset.id = itemId;
+        listItem.dataset.price = itemPrice;
+        listItem.dataset.cookTime = itemCookTime;
+        listItem.innerHTML = `
+          <span>${itemName} - $${itemPrice}</span>
+          <div>
+            <button class="btn btn-danger btn-sm remove-from-order">-</button>
+          </div>
+        `;
+        orderList.appendChild(listItem);
+
+        // Update total price and cook time
+        totalPrice += itemPrice;
+        totalCookTime += itemCookTime;
+        totalPriceElem.textContent = totalPrice.toFixed(2);
+        totalCookTimeElem.textContent = totalCookTime;
+      }
+    });
+
+    orderList.addEventListener("click", (e) => {
+      if (e.target.classList.contains("remove-from-order")) {
+        const listItem = e.target.closest("li");
+        const itemPrice = parseFloat(listItem.dataset.price);
+        const itemCookTime = parseInt(listItem.dataset.cookTime);
+
+        // Remove item from order list
+        orderList.removeChild(listItem);
+
+        // Update total price and cook time
+        totalPrice -= itemPrice;
+        totalCookTime -= itemCookTime;
+        totalPriceElem.textContent = totalPrice.toFixed(2);
+        totalCookTimeElem.textContent = totalCookTime;
+      }
+    });
+
+    document.getElementById("checkout").addEventListener("click", () => {
+      const orderItems = [];
+      orderList.querySelectorAll("li").forEach((item) => {
+        const itemId = item.dataset.id;
+        const itemName = item.textContent.split(" - $")[0];
+        const itemPrice = parseFloat(item.dataset.price);
+        const itemQuantity = 1;
+
+        orderItems.push({
+          id: itemId,
+          name: itemName,
+          price: itemPrice,
+          quantity: itemQuantity,
+        });
+      });
+
+      const orderData = {
+        username: "guest", // This should be replaced with the actual username
+        items: orderItems,
+        total_price: totalPrice,
+        total_cook_time: totalCookTime,
+      };
+
+      fetch("/orders/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.id) {
+            alert("Order successfully created!");
+            // Reset order
+            orderList.innerHTML = "";
+            totalPrice = 0;
+            totalCookTime = 0;
+            totalPriceElem.textContent = "0.00";
+            totalCookTimeElem.textContent = "0";
+          } else {
+            console.error("Error creating order:", data.error);
+            alert("Error creating order");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>

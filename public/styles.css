@@ -1,0 +1,10 @@
+#order-calculator {
+  width: 100%; /* Ensure it takes the full width of the parent */
+  top: 1rem; /* Adjust as needed */
+}
+
+@media (max-width: 992px) {
+  #order-calculator {
+    position: static; /* Remove fixed position on smaller screens */
+  }
+}

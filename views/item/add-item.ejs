@@ -1,0 +1,61 @@
+<%- include('../partials/head') %>
+
+<div class="container">
+  <h1 class="mt-5">Add Item</h1>
+  <form action="/items/add" method="post">
+    <div class="form-group">
+      <label for="name">Name:</label>
+      <input
+        type="text"
+        class="form-control"
+        id="name"
+        name="name"
+        value="Burger"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="img_url">Image URL:</label>
+      <input
+        type="text"
+        class="form-control"
+        id="img_url"
+        name="img_url"
+        value="/items/1.webp"
+      />
+    </div>
+    <div class="form-group">
+      <label for="price">Price:</label>
+      <input
+        type="number"
+        class="form-control"
+        id="price"
+        name="price"
+        step="0.01"
+        value="0.00"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="cook_time">Cook Time:</label>
+      <input
+        type="text"
+        class="form-control"
+        id="cook_time"
+        name="cook_time"
+        value="10 minutes"
+      />
+    </div>
+    <div class="form-group">
+      <label for="category">Category:</label>
+      <select class="form-control" id="category" name="category_id" required>
+        <% categories.forEach(category => { %>
+        <option value="<%= category.id %>"><%= category.name %></option>
+        <% }); %>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Item</button>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

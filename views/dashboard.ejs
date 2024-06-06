@@ -1,0 +1,55 @@
+<!-- dashboard.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar --><!-- Sidebar -->
+        <div class="col-md-3 bg-light">
+          <h3 class="my-4">Dashboard</h3>
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="/events/new">Add Event</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/events">Manage Events</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/halls/new">Add Hall</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/halls">Manage Halls</a>
+            </li>
+            <!-- Add more links as needed -->
+          </ul>
+          <!-- Logout and Manage Account buttons -->
+          <div class="mt-auto">
+            <a href="/auth/logout" class="btn btn-danger">Logout</a>
+            <a href="/admins" class="btn btn-primary mt-2">Manage Account</a>
+          </div>
+        </div>
+        <!-- Main Content -->
+        <div class="col-md-9">
+          <h1 class="my-4">Analytics</h1>
+          <!-- Add analytics content here -->
+          <% include components/eventsList.ejs %> <% include
+          components/hallsList.ejs %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
